@@ -1,0 +1,19 @@
+[User A]                   [Ethereum AtomicSwap]                  [Relayer]                  [Bitcoin HTLC]                [User B]
+   |                             |                                  |                             |                          |
+   |---- Initiate Swap ---------->|                                  |                             |                          |
+   |                             |-- Emit SwapInitiated Event ----->|                             |                          |
+   |                             |                                  |-- Create Swap on BTC ------>|                          |
+   |                             |                                  |                             |-- Lock BTC using HTLC -->|
+   |                             |                                  |                             |                          |
+   |                             |<-------- Event Observed --------|                             |                          |
+   |                             |                                  |                             |                          |
+   |                             |                                  |<---- Notify User B --------|                          |
+   |                             |                                  |                             |                          |
+   |                             |                                  |                             |                          |
+   |                             |                                  |                             |<-- Claim BTC using S ----|
+   |                             |                                  |                             |                          |
+   |                             |<-------- Event: SwapClaimed -----|                             |                          |
+   |                             |-- Claim ETH using S ------------>|                             |                          |
+   |                             |                                  |                             |                          |
+   |                             |<-------- Swap Complete ----------|                             |                          |
+   |                             |                                  |                             |                          |

@@ -1,0 +1,46 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract AtomicSwap {
+    struct Swap {
+        address initiator;
+        address participant;
+        uint256 amount;
+        bytes32 secretHash;
+        uint256 deadline;
+        bool claimed;
+    }
+
+    mapping(bytes32 => Swap) public swaps;
+
+    event SwapInitiated(bytes32 indexed swapId, address initiator, address participant, uint256 amount, bytes32 secretHash, uint256 deadline);
+    event SwapClaimed(bytes32 indexed swapId, bytes32 secret);
+    event SwapRefunded(bytes32 indexed swapId);
+
+    function initiateSwap(address participant, bytes32 secretHash, uint256 deadline) external payable {
+        require(msg.value > 0, "Amount must be greater than 0");
+        bytes32 swapId = keccak256(abi.encodePacked(msg.sender, participant, secretHash, block.timestamp));
+        swaps[swapId] = Swap(msg.sender, participant, msg.value, secretHash, deadline, false);
+        emit SwapInitiated(swapId, msg.sender, participant, msg.value, secretHash, deadline);
+    }
+
+    function claimSwap(bytes32 swapId, bytes32 secret) external {
+        Swap storage s = swaps[swapId];
+        require(msg.sender == s.participant, "Not participant");
+        require(!s.claimed, "Already claimed");
+        require(keccak256(abi.encodePacked(secret)) == s.secretHash, "Invalid secret");
+        s.claimed = true;
+        payable(s.participant).transfer(s.amount);
+        emit SwapClaimed(swapId, secret);
+    }
+
+    function refundSwap(bytes32 swapId) external {
+        Swap storage s = swaps[swapId];
+        require(msg.sender == s.initiator, "Not initiator");
+        require(!s.claimed, "Already claimed");
+        require(block.timestamp >= s.deadline, "Deadline not reached");
+        s.claimed = true;
+        payable(s.initiator).transfer(s.amount);
+        emit SwapRefunded(swapId);
+    }
+}

@@ -1,0 +1,132 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.20;
+
+/*
+    UNIVERSAL SWAP CONTRACT (PSEUDOCODE VERSION)
+    ----------------------------------------------------
+    This contract represents the EVM-side component of a
+    cross-chain atomic swap. It coordinates:
+        • hash-locked deposits
+        • time-locked refunds
+        • secret revelation events
+        • cross-chain event validation logic
+    
+*/
+
+contract UniversalAtomicSwap {
+
+    struct Swap {
+        address initiator;        // sender on this chain
+        address participant;      // counterparty
+        uint256 amount;           // amount locked
+        uint256 deadline;         // refund time
+        bytes32 secretHash;       // hash of secret S
+        bool    claimed;          // has been withdrawn?
+        bool    refunded;         // has been refunded?
+    }
+
+    // swapId => Swap state
+    mapping(bytes32 => Swap) public swaps;
+
+    // Events for off-chain monitoring and cross-chain relays
+    event SwapInitiated(
+        bytes32 indexed swapId,
+        address indexed initiator,
+        address indexed participant,
+        bytes32 secretHash,
+        uint256 amount,
+        uint256 deadline
+    );
+
+    event SwapClaimed(
+        bytes32 indexed swapId,
+        bytes32 secret
+    );
+
+    event SwapRefunded(
+        bytes32 indexed swapId
+    );
+
+    /*
+        initiateSwap:
+        Locks funds under the secret hash H = Hash(secret).
+        The counterparty can only withdraw if they know the secret.
+        Refund available after the deadline.
+    */
+    function initiateSwap(
+        bytes32 swapId,
+        address participant,
+        bytes32 secretHash
+    )
+        external
+        payable
+    {
+        require(msg.value > 0, "No funds provided");
+        require(swaps[swapId].initiator == address(0), "Swap already exists");
+
+        swaps[swapId] = Swap({
+            initiator: msg.sender,
+            participant: participant,
+            amount: msg.value,
+            deadline: block.timestamp + 3600, // PSEUDO timeout
+            secretHash: secretHash,
+            claimed: false,
+            refunded: false
+        });
+
+        emit SwapInitiated(
+            swapId,
+            msg.sender,
+            participant,
+            secretHash,
+            msg.value,
+            swaps[swapId].deadline
+        );
+    }
+
+    /*
+        claim:
+        The participant reveals the secret S, and if
+        Hash(S) matches secretHash, they receive the funds.
+    */
+    function claim(bytes32 swapId, bytes32 secret) external {
+        Swap storage s = swaps[swapId];
+
+        require(msg.sender == s.participant, "Not participant");
+        require(!s.claimed && !s.refunded, "Already resolved");
+        require(keccak256(abi.encodePacked(secret)) == s.secretHash, "Invalid secret");
+        require(block.timestamp < s.deadline, "Deadline passed");
+
+        s.claimed = true;
+
+        // send funds
+        payable(s.participant).transfer(s.amount);
+
+        emit SwapClaimed(swapId, secret);
+
+        /*
+            The secret revealed here must be picked up by off-chain
+            relayers (or a light client) and used to unlock the 
+            counter-swap on the other chain.
+        */
+    }
+
+    /*
+        refund:
+        If the participant fails to claim before deadline,
+        the initiator can reclaim their funds.
+    */
+    function refund(bytes32 swapId) external {
+        Swap storage s = swaps[swapId];
+
+        require(msg.sender == s.initiator, "Not initiator");
+        require(!s.claimed && !s.refunded, "Already resolved");
+        require(block.timestamp >= s.deadline, "Deadline not reached");
+
+        s.refunded = true;
+
+        payable(s.initiator).transfer(s.amount);
+
+        emit SwapRefunded(swapId);
+    }
+}

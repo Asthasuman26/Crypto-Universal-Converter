@@ -1,0 +1,89 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+/// @title Production-Grade Atomic Swap (Partial Module)
+/// @notice Secure, reusable contract module for cross-chain swaps
+/// @dev Includes reentrancy guard, upgradeable pattern ready, and strict secret handling
+
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract AtomicSwap is ReentrancyGuard, Ownable {
+
+    struct Swap {
+        address initiator;
+        address participant;
+        uint256 amount;
+        bytes32 secretHash;
+        uint256 deadline; // timestamp
+        bool claimed;
+        bool refunded;
+    }
+
+    /// @notice Mapping of unique swap IDs to Swap structs
+    mapping(bytes32 => Swap) private swaps;
+
+    /// @notice Events for transparency & monitoring
+    event SwapInitiated(bytes32 indexed swapId, address indexed initiator, address indexed participant, uint256 amount, uint256 deadline);
+    event SwapClaimed(bytes32 indexed swapId, bytes secret);
+    event SwapRefunded(bytes32 indexed swapId);
+
+    /// @notice Create a new atomic swap
+    function initiateSwap(
+        bytes32 swapId,
+        address participant,
+        bytes32 secretHash,
+        uint256 timelockSeconds
+    ) external payable nonReentrant {
+        require(msg.value > 0, "Cannot initiate swap with 0 value");
+        require(swaps[swapId].initiator == address(0), "Swap already exists");
+
+        swaps[swapId] = Swap({
+            initiator: msg.sender,
+            participant: participant,
+            amount: msg.value,
+            secretHash: secretHash,
+            deadline: block.timestamp + timelockSeconds,
+            claimed: false,
+            refunded: false
+        });
+
+        emit SwapInitiated(swapId, msg.sender, participant, msg.value, swaps[swapId].deadline);
+    }
+
+    /// @notice Claim the swap using the secret
+    function claim(bytes32 swapId, bytes calldata secret) external nonReentrant {
+        Swap storage s = swaps[swapId];
+        require(msg.sender == s.participant, "Not authorized");
+        require(!s.claimed && !s.refunded, "Swap already finalized");
+        require(keccak256(secret) == s.secretHash, "Incorrect secret");
+        require(block.timestamp < s.deadline, "Swap expired");
+
+        s.claimed = true;
+
+        (bool success, ) = s.participant.call{value: s.amount}("");
+        require(success, "Transfer failed");
+
+        emit SwapClaimed(swapId, secret);
+    }
+
+    /// @notice Refund the swap to initiator after deadline
+    function refund(bytes32 swapId) external nonReentrant {
+        Swap storage s = swaps[swapId];
+        require(msg.sender == s.initiator, "Not authorized");
+        require(!s.claimed && !s.refunded, "Swap already finalized");
+        require(block.timestamp >= s.deadline, "Swap not expired");
+
+        s.refunded = true;
+
+        (bool success, ) = s.initiator.call{value: s.amount}("");
+        require(success, "Refund failed");
+
+        emit SwapRefunded(swapId);
+    }
+
+    /// @notice View swap details (read-only)
+    function getSwap(bytes32 swapId) external view returns (Swap memory) {
+        return swaps[swapId];
+    }
+}
