@@ -1,0 +1,35 @@
+         +---------------------+
+         |  User A (Initiator) |
+         +---------------------+
+                   |
+                   | Lock BTC (HTLC)
+                   v
+        +-------------------+
+        |  Bitcoin Network  |
+        +-------------------+
+                   |
+        Secret S revealed on BTC redemption
+                   |
+                   v
++------------------------------------+
+| Cross-Chain Relay / Light Client   |
+| Watches BTC network for Secret S   |
++------------------------------------+
+                   |
+                   | Triggers claims
+                   v
+      +-----------------------+
+      | Ethereum / EVM Swap   |
+      +-----------------------+
+                   |
+                   | Secret S triggers claim
+                   v
+      +-----------------------+
+      | Solana Swap Program   |
+      +-----------------------+
+                   |
+                   | Secret S triggers claim
+                   v
+          +----------------+
+          | TON Swap Contract |
+          +----------------+
