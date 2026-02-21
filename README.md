@@ -1,12 +1,12 @@
-**Universal Cross-Chain Swap Platform**
+## **Universal Cross-Chain Swap Platform**
 
 A decentralized protocol for direct, peer-to-peer cryptocurrency swaps across different blockchains — without custody, centralized exchanges, or trusted intermediaries.
 
-**Overview** 
+## **Overview** 
 
 The Universal Cross-Chain Swap Platform enables users to exchange assets across independent blockchains in a trust-minimized way.
 
-*Examples:*
+# *Examples:*
 
 Swap Bitcoin (BTC) for Ethereum (ETH)
 
@@ -20,7 +20,7 @@ No wrapped tokens.
 
 Users retain control of their private keys at all times.
 
-**Problem Statement**
+## **Problem Statement**
 
 Today, cross-chain swaps typically require:
 
@@ -32,7 +32,7 @@ Trading within their internal order book
 
 Withdrawing assets back to a personal wallet
 
-*This model introduces serious risks:*
+# *This model introduces serious risks:*
 
 Exchange hacks
 
@@ -54,7 +54,7 @@ Increased complexity
 
 Crypto infrastructure should not require surrendering custody or trust.
 
-**Solution**
+## **Solution**
 
 This protocol enables direct peer-to-peer atomic swaps across blockchains.
 
@@ -64,7 +64,7 @@ Alice holds BTC and wants ETH
 
 Bob holds ETH and wants BTC
 
-**The protocol:**
+## **The protocol:**
 
 Locks both users’ funds under cryptographic conditions
 
@@ -74,7 +74,7 @@ Executes the swap only if both transfers succeed
 
 Automatically refunds both parties if conditions are not met
 
-**Guarantees**
+## **Guarantees**
 
 No counterparty can steal funds
 
@@ -101,7 +101,7 @@ No central authority
 Supported Architecture
 
 
-**The protocol is designed to support:**
+## **The protocol is designed to support:**
 
 UTXO-based chains (e.g., Bitcoin)
 
@@ -109,8 +109,8 @@ Smart contract chains (e.g., Ethereum)
 
 High-throughput chains (e.g., Solana)
 
-**How It Works**
-*Core Components*
+## **How It Works**
+# *Core Components*
 
 Smart contracts (for contract-enabled chains)
 
@@ -138,7 +138,7 @@ No login.
 No deposits.
 No accounts.
 
-*Why This Is Different
+# *Why This Is Different
 Compared to Centralized Exchanges*
 
 No fund deposits
@@ -161,7 +161,7 @@ No complex cross-chain mint/burn systems
 
 This is a direct asset-for-asset swap protocol.
 
-**Target Users**
+## **Target Users**
 
 Privacy-focused traders
 
@@ -171,26 +171,26 @@ DeFi users moving across ecosystems
 
 Developers building multi-chain applications
 
-**Roadmap**
-*Phase 1*
+## **Roadmap**
+# *Phase 1*
 
 Core swap engine
 
 BTC ↔ ETH support
 
-*Phase 2*
+# *Phase 2*
 
 Add SOL, ADA, XRP
 
 Public UI release
 
-*Phase 3*
+# *Phase 3*
 
 Liquidity incentive mechanisms
 
 DAO governance layer
 
-**Long-Term Vision**
+## **Long-Term Vision**
 
 Build a fully decentralized liquidity network that connects every major blockchain into a unified financial layer.
 
