@@ -1,4 +1,4 @@
-## **Universal Cross-Chain Swap Platform**
+# **Universal Cross-Chain Swap Platform**
 
 A decentralized protocol for direct, peer-to-peer cryptocurrency swaps across different blockchains — without custody, centralized exchanges, or trusted intermediaries.
 
@@ -6,7 +6,7 @@ A decentralized protocol for direct, peer-to-peer cryptocurrency swaps across di
 
 The Universal Cross-Chain Swap Platform enables users to exchange assets across independent blockchains in a trust-minimized way.
 
-# **Examples:**
+## **Examples:**
 
 Swap Bitcoin (BTC) for Ethereum (ETH)
 
@@ -32,7 +32,7 @@ Trading within their internal order book
 
 Withdrawing assets back to a personal wallet
 
-# **This model introduces serious risks:**
+## **This model introduces serious risks:**
 
 Exchange hacks
 
@@ -58,7 +58,7 @@ Crypto infrastructure should not require surrendering custody or trust.
 
 This protocol enables direct peer-to-peer atomic swaps across blockchains.
 
-*Example Scenario*
+## *Example Scenario*
 
 Alice holds BTC and wants ETH
 
@@ -110,7 +110,7 @@ Smart contract chains (e.g., Ethereum)
 High-throughput chains (e.g., Solana)
 
 ## **How It Works**
-# **Core Components**
+## **Core Components**
 
 Smart contracts (for contract-enabled chains)
 
@@ -138,8 +138,7 @@ No login.
 No deposits.
 No accounts.
 
-# **Why This Is Different
-# Compared to Centralized Exchanges**
+## Why This Is Different Compared to Centralized Exchanges
 
 No fund deposits
 
@@ -172,19 +171,19 @@ DeFi users moving across ecosystems
 Developers building multi-chain applications
 
 ## **Roadmap**
-# **Phase 1**
+## **Phase 1**
 
 Core swap engine
 
 BTC ↔ ETH support
 
-# **Phase 2**
+## **Phase 2**
 
 Add SOL, ADA, XRP
 
 Public UI release
 
-# **Phase 3**
+## **Phase 3**
 
 Liquidity incentive mechanisms
 
